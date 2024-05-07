@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".PlayerActivity">
 
-
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
@@ -34,25 +33,31 @@
 
 
     <TextView
-        android:id="@+id/tittleView"
+        android:id="@+id/songNamePA"
         style="@style/Text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_marginStart="30dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="30dp"
         android:background="@xml/rounded_corner"
         android:text="TextView"
         android:textAlignment="center"
-        android:textSize="40dp"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:scrollHorizontally="true"
+        android:textSize="34sp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
     <TextView
-        android:id="@+id/durationView"
+        android:id="@+id/songDurationPA"
         style="@style/Text"
         android:layout_width="118dp"
         android:layout_height="wrap_content"
@@ -65,7 +70,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.903"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tittleView"
+        app:layout_constraintTop_toBottomOf="@+id/songNamePA"
         tools:ignore="RtlCompat" />
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -80,7 +85,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/durationView"
+        app:layout_constraintTop_toBottomOf="@+id/songDurationPA"
         app:layout_constraintVertical_bias="0.136"
         app:shapeAppearanceOverlay="@style/curved"
         app:strokeWidth="5dp" />
@@ -110,7 +115,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
-            android:id="@+id/back_btn"
+            android:id="@+id/previousBtnPA"
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:background="?attr/selectableItemBackground"
@@ -121,24 +126,24 @@
 
         <Space
             android:layout_width="20dp"
-            android:layout_height="0dp" />
+            android:layout_height="match_parent" />
 
         <ImageButton
-            android:id="@+id/play_btn"
+            android:id="@+id/playPauseBtnPA"
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:background="?attr/selectableItemBackground"
             android:contentDescription="Play Song"
             android:padding="5dp"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/baseline_play_arrow_24" />
+            app:srcCompat="@drawable/baseline_pause_24" />
 
         <Space
             android:layout_width="20dp"
-            android:layout_height="0dp" />
+            android:layout_height="match_parent" />
 
         <ImageButton
-            android:id="@+id/next_btn"
+            android:id="@+id/nextBtnPA"
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:background="?attr/selectableItemBackground"
@@ -160,7 +165,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
-            android:id="@+id/repeat_btn"
+            android:id="@+id/repeatBtnPA"
             style="@style/ButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -171,18 +176,18 @@
             android:layout_weight="1"/>
 
         <ImageButton
-            android:id="@+id/random_btn"
+            android:id="@+id/shuffleBtnPA"
             style="@style/ButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="Random"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/baseline_shuffle_24"
+            app:srcCompat="@drawable/baseline_reorder_24"
             android:layout_weight="1" />
 
         <ImageButton
-            android:id="@+id/repeat_song_btn"
+            android:id="@+id/repeatSongBtnPA"
             style="@style/ButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -193,7 +198,7 @@
             android:layout_weight="1" />
 
         <ImageButton
-            android:id="@+id/favorite_btn"
+            android:id="@+id/favoriteBtnPA"
             style="@style/ButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
