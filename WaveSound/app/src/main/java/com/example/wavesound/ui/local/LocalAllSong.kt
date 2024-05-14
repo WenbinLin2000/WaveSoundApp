@@ -4,42 +4,26 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wavesound.Music
-import com.example.wavesound.MusicAdapter
 import com.example.wavesound.databinding.FragmentLocalAllSongBinding
 import java.io.File
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-private lateinit var binding: FragmentLocalAllSongBinding
-
 class LocalAllSong : Fragment() {
 
-    private var param1: String? = null
-    private var param2: String? = null
     private lateinit var binding: FragmentLocalAllSongBinding
     private lateinit var musicAdapter: MusicAdapter
 
     companion object {
 
-        lateinit var MusicListMA : ArrayList<Music>
-
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            LocalAllSong().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        var MusicListMA: ArrayList<Music> = ArrayList()
+        private var originalMusicList: ArrayList<Music> = ArrayList()
+        lateinit var musicListSearch : ArrayList<Music>
+        var search: Boolean = false
     }
 
     override fun onCreateView(
@@ -53,10 +37,20 @@ class LocalAllSong : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        originalMusicList = getAllAdioFiles()
         initializeLayout()
+
+
+        binding.searchBtn.setOnClickListener {
+
+            val searchText = binding.searchInput.text.toString().trim()
+            searchSongs(searchText)
+
+        }
     }
 
     private fun initializeLayout() {
+        search = false
         MusicListMA = getAllAdioFiles()
         binding.localAllSongRV.setHasFixedSize(true)
         binding.localAllSongRV.setItemViewCacheSize(13)
@@ -65,6 +59,29 @@ class LocalAllSong : Fragment() {
         binding.localAllSongRV.adapter = musicAdapter
         binding.totalSongs.text = "Total Songs: "+ musicAdapter.itemCount.toString()
     }
+
+    private fun searchSongs(songTxt: String) {
+        if (songTxt.isNotEmpty()) {
+            musicListSearch = ArrayList()
+           for (song in MusicListMA) {
+               if (song.title.contains(songTxt, ignoreCase = true) ||
+                   song.album.contains(songTxt, ignoreCase = true) ||
+                   song.artist.contains(songTxt, ignoreCase = true)) {
+                   musicListSearch.add(song)
+               }
+           }
+            search = true
+            musicAdapter.updateMusicList(searchList = musicListSearch)
+            binding.totalSongs.text = "Total Songs: ${musicAdapter.itemCount}"
+        } else {
+            search = false
+            MusicListMA = originalMusicList
+            musicAdapter.setData(MusicListMA)
+            binding.totalSongs.text = "Total Songs: ${musicAdapter.itemCount}"
+
+        }
+    }
+
 
     @SuppressLint("Range")
     private fun getAllAdioFiles(): ArrayList<Music>{

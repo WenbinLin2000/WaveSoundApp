@@ -62,7 +62,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.14.2")
 
     // For Notification
-    implementation("androidx.media:media:1.3.0")
+    implementation("androidx.media:media:1.7.0")
 
     // For storing objects in shared preferences
     implementation("com.google.code.gson:gson:2.10")

@@ -3,24 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home"
+    app:startDestination="@+id/nav_local"
     >
 
     <fragment
-        android:id="@+id/nav_home"
+        android:id="@+id/nav_local"
         android:name="com.example.wavesound.ui.local.LocalFragment"
-        android:label="@string/menu_home"
+        android:label="@string/menu_local"
         tools:layout="@layout/fragment_local" />
 
     <fragment
-        android:id="@+id/nav_gallery"
+        android:id="@+id/nav_online"
         android:name="com.example.wavesound.ui.online.OnlineFragment"
-        android:label="@string/menu_gallery"
+        android:label="@string/menu_online"
         tools:layout="@layout/fragment_online" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
+        android:id="@+id/nav_user"
         android:name="com.example.wavesound.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:label="@string/menu_user"
+        tools:layout="@layout/fragment_usuario" />
 </navigation>
