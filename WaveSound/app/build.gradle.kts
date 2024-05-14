@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.wavesound"
-        minSdk = 29
+        minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -40,6 +40,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
 }
 
 dependencies {
@@ -66,5 +67,12 @@ dependencies {
 
     // For storing objects in shared preferences
     implementation("com.google.code.gson:gson:2.10")
+
+    implementation("com.arthenica:mobile-ffmpeg-full:4.4.LTS")
+
+    // MobileFFmpeg: Biblioteca de integración para Android
+    implementation("com.arthenica:mobile-ffmpeg-full:4.4")
+
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
 
 }

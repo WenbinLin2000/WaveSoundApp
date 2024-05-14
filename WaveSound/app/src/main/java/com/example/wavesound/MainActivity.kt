@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -34,13 +33,14 @@ class MainActivity : AppCompatActivity() {
     private val READ_MEDIA_AUDIO_PERMISSION_CODE = 1002
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Verificar y solicitar permisos al iniciar la aplicación por primera vez
+        checkAndRequestPermissions()
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Verificar y solicitar permisos al iniciar la aplicación por primera vez
-        checkAndRequestPermissions()
+
         LocalFavorite.favoriteSongs = ArrayList()
         val editor = getSharedPreferences("FAVORITES", MODE_PRIVATE)
         val jsonString = editor.getString("FavoriteSongs", null)
@@ -83,12 +83,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkAndRequestPermissions() {
-        //val writeStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val writeStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         val readMediaAudioPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO)
 
         val permissionsToRequest = ArrayList<String>()
 
-        /*
+        /*Denegado por seguridad de google
         if (writeStoragePermission != PackageManager.PERMISSION_GRANTED) {
             permissionsToRequest.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
@@ -105,20 +105,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Log.d("MainActivity", "hola")
         if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSION_CODE || requestCode == READ_MEDIA_AUDIO_PERMISSION_CODE) {
-            Log.d("MainActivity", "que tal?")
             if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                // Todos los permisos solicitados fueron concedidos, puedes realizar las acciones necesarias aquí
                 restartApplication()
             } else {
                 // Al menos un permiso fue denegado, manejar en consecuencia
-
+                // Por ejemplo, mostrar un mensaje al usuario o tomar otra acción
             }
-
         }
-        Log.d("MainActivity", "adios")
-
     }
+
     private fun restartApplication() {
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
