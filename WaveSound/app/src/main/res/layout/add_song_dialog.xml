@@ -26,4 +26,23 @@
             android:maxLength="40"/>
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:boxStrokeColor="@color/black"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        app:startIconDrawable="@drawable/baseline_music_video_24"
+        app:startIconTint="@color/white"
+        android:hint="Song Name">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/songName"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:singleLine="true"
+            android:background="@color/button"
+            android:inputType="text"
+            android:maxLength="40"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
 </LinearLayout>

@@ -1,15 +1,17 @@
 package com.example.wavesound.ui.local
 
 import android.annotation.SuppressLint
+import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wavesound.Music
@@ -17,17 +19,13 @@ import com.example.wavesound.R
 import com.example.wavesound.databinding.AddSongDialogBinding
 import com.example.wavesound.databinding.FragmentLocalAllSongBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import okhttp3.Call
-import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
-import java.io.BufferedInputStream
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 
 class LocalAllSong : Fragment() {
 
@@ -75,19 +73,11 @@ class LocalAllSong : Fragment() {
             .setTitle("Add Song")
             .setPositiveButton("ADD"){ dialog, _ ->
                 val songURL = binder.songURL.text
+                val songName = binder.songName.text
                 Log.d("Song URL1", songURL.toString())
                 if(songURL != null)
                     if(songURL.isNotEmpty()) {
-                        /*
-                        val destinationPath = "/storage/emulated/0/Download/archivo.mp3"
-
-                        Log.d("Song URL2", songURL.toString())
-                        val mp3Downloader = Mp3Downloader()
-                        mp3Downloader.downloadMp3FromUrl(songURL.toString(), destinationPath)
-
-                        val task = DownloadAndConvertTask(requireContext())
-                        task.execute(songURL.toString())
-                        */
+                        convertAndDownloadAudio(songURL.toString(), songName.toString())
 
                     }
                 dialog.dismiss()
@@ -176,108 +166,60 @@ class LocalAllSong : Fragment() {
         return tempList
     }
 
-    private inner class DownloadAndConvertTask(private val context: Context) : AsyncTask<String, Void, Boolean>() {
 
-        override fun doInBackground(vararg urls: String): Boolean {
-            val youtubeUrl = urls[0]
-            val videoPath = downloadVideo(youtubeUrl)
-            if (videoPath != null) {
-                val mp3Path = convertToMP3(videoPath)
-                return mp3Path != null
-            }
-            return false
+
+    private fun convertAndDownloadAudio(youtubeUrl: String, audioName: String) {
+        val client = OkHttpClient()
+
+        val json = JSONObject().apply {
+            put("url", youtubeUrl)
+            put("audioName", audioName)
         }
+        val requestBody = json.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
-        private fun downloadVideo(youtubeUrl: String): String? {
-            var videoPath: String? = null
-            try {
-                val url = URL(youtubeUrl)
-                val connection = url.openConnection() as HttpURLConnection
-                connection.connect()
-                if (connection.responseCode == HttpURLConnection.HTTP_OK) {
-                    val inputStream = BufferedInputStream(connection.inputStream)
-                    val file = File(context.filesDir, "video.mp4") // Guardar en el directorio de almacenamiento interno de la aplicación
-                    val outputStream = FileOutputStream(file)
-                    val buffer = ByteArray(1024)
-                    var bytesRead: Int
-                    while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                        outputStream.write(buffer, 0, bytesRead)
-                    }
-                    outputStream.close()
-                    inputStream.close()
-                    videoPath = file.absolutePath
+        val request = Request.Builder()
+            .url("http://192.168.1.105:3000/downloadAudioLocal")
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).enqueue(object : okhttp3.Callback {
+            override fun onFailure(call: okhttp3.Call, e: IOException) {
+                Log.e("NetworkError", "Error contacting server: ${e.message}", e)
+                activity?.runOnUiThread {
+                    Toast.makeText(requireContext(), "Error contacting server", Toast.LENGTH_SHORT).show()
                 }
-                Log.d("DownloadAndConvertTask", "Video descargado.")
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
-            return videoPath
-        }
 
-        private fun convertToMP3(videoPath: String): String? {
-            var mp3Path: String? = null
-            try {
-                val videoFile = File(videoPath)
-                val mp3File = File(context.filesDir, "audio.mp3") // Guardar en el directorio de almacenamiento interno de la aplicación
-                // Ejemplo: Convertir el video a mp3 usando MobileFFmpeg
-                val command = arrayOf(
-                    "-i", videoFile.absolutePath,
-                    "-vn",
-                    "-acodec", "libmp3lame",
-                    "-ar", "44100",
-                    "-ac", "2",
-                    "-b:a", "192k",
-                    mp3File.absolutePath
-                )
-                val result = com.arthenica.mobileffmpeg.FFmpeg.execute(command)
-                    mp3Path = mp3File.absolutePath
-                Log.d("DownloadAndConvertTask", "Video convertido a MP3.")
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            return mp3Path
-        }
-
-
-
-        override fun onPostExecute(result: Boolean) {
-            super.onPostExecute(result)
-            // Aquí puedes manejar el resultado de la tarea, como mostrar un mensaje de éxito o error
-            if (result) {
-                Log.d("DownloadAndConvertTask", "Video descargado y convertido a MP3.")
-            } else {
-                Log.e("DownloadAndConvertTask", "Error al descargar y convertir el video a MP3.")
-            }
-        }
-    }
-
-    class Mp3Downloader {
-
-        fun downloadMp3FromUrl(url: String, destinationPath: String) {
-            val client = OkHttpClient()
-
-            val request = Request.Builder()
-                .url(url)
-                .build()
-
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    // Manejar errores
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        val inputStream = response.body?.byteStream()
-                        val outputFile = File(destinationPath)
-
-                        FileOutputStream(outputFile).use { output ->
-                            inputStream?.copyTo(output)
-                        }
-                    } else {
-                        // Manejar respuestas no exitosas
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                if (response.isSuccessful) {
+                    val responseJson = JSONObject(response.body?.string() ?: "")
+                    val downloadUrl = responseJson.getString("path")
+                    downloadMp3FromUrl(requireContext(), downloadUrl)
+                } else {
+                    Log.e("ServerError", "Failed to convert video: ${response.message}")
+                    activity?.runOnUiThread {
+                        Toast.makeText(requireContext(), "Failed to convert video", Toast.LENGTH_SHORT).show()
                     }
                 }
-            })
-        }
+            }
+        })
     }
+
+    private fun downloadMp3FromUrl(context: Context, url: String) {
+        val request = DownloadManager.Request(Uri.parse(url))
+            .setTitle("Downloading MP3")
+            .setDescription("Downloading your file")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setAllowedOverMetered(true)
+            .setAllowedOverRoaming(true)
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, "downloaded_music.mp3")
+
+        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager.enqueue(request)
+        activity?.runOnUiThread {
+            Toast.makeText(context, "Download started", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
 }

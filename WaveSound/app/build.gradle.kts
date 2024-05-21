@@ -70,9 +70,15 @@ dependencies {
 
     implementation("com.arthenica:mobile-ffmpeg-full:4.4.LTS")
 
-    // MobileFFmpeg: Biblioteca de integración para Android
-    implementation("com.arthenica:mobile-ffmpeg-full:4.4")
 
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
+
+
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
+    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.appcompat:appcompat:1.4.0")
+    implementation("com.google.android.material:material:1.5.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.2")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
 }
