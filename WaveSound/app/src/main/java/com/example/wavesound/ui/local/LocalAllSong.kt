@@ -26,12 +26,13 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class LocalAllSong : Fragment() {
 
     private lateinit var binding: FragmentLocalAllSongBinding
     private lateinit var musicAdapter: MusicAdapter
-
+    private lateinit var DownloadName: String
     companion object {
 
         var MusicListMA: ArrayList<Music> = ArrayList()
@@ -74,6 +75,7 @@ class LocalAllSong : Fragment() {
             .setPositiveButton("ADD"){ dialog, _ ->
                 val songURL = binder.songURL.text
                 val songName = binder.songName.text
+                DownloadName = songName.toString()
                 Log.d("Song URL1", songURL.toString())
                 if(songURL != null)
                     if(songURL.isNotEmpty()) {
@@ -167,9 +169,12 @@ class LocalAllSong : Fragment() {
     }
 
 
-
     private fun convertAndDownloadAudio(youtubeUrl: String, audioName: String) {
-        val client = OkHttpClient()
+        val client = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)  // Tiempo de espera para establecer la conexión
+            .readTimeout(30, TimeUnit.SECONDS)     // Tiempo de espera para leer los datos
+            .writeTimeout(30, TimeUnit.SECONDS)    // Tiempo de espera para escribir los datos
+            .build()
 
         val json = JSONObject().apply {
             put("url", youtubeUrl)
@@ -178,27 +183,29 @@ class LocalAllSong : Fragment() {
         val requestBody = json.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
         val request = Request.Builder()
-            .url("http://192.168.1.105:3000/downloadAudioLocal")
+            .url("http://192.168.1.105:3000/downloadAudioLocal") // Actualiza esto con la IP de tu servidor
             .post(requestBody)
             .build()
 
         client.newCall(request).enqueue(object : okhttp3.Callback {
             override fun onFailure(call: okhttp3.Call, e: IOException) {
-                Log.e("NetworkError", "Error contacting server: ${e.message}", e)
-                activity?.runOnUiThread {
-                    Toast.makeText(requireContext(), "Error contacting server", Toast.LENGTH_SHORT).show()
+                Log.e("NetworkError", "Error al contactar con el servidor: ${e.message}", e)
+                requireActivity().runOnUiThread {
+                    Toast.makeText(requireContext(), "Error al contactar con el servidor", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-                if (response.isSuccessful) {
-                    val responseJson = JSONObject(response.body?.string() ?: "")
-                    val downloadUrl = responseJson.getString("path")
-                    downloadMp3FromUrl(requireContext(), downloadUrl)
-                } else {
-                    Log.e("ServerError", "Failed to convert video: ${response.message}")
-                    activity?.runOnUiThread {
-                        Toast.makeText(requireContext(), "Failed to convert video", Toast.LENGTH_SHORT).show()
+                response.use {
+                    if (it.isSuccessful) {
+                        val responseJson = JSONObject(it.body?.string() ?: "")
+                        val downloadUrl = responseJson.getString("path")
+                        downloadMp3FromUrl(requireContext(), downloadUrl)
+                    } else {
+                        Log.e("ServerError", "Fallo al convertir el video: ${response.message}")
+                        requireActivity().runOnUiThread {
+                            Toast.makeText(requireContext(), "Fallo al convertir el video", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
@@ -207,19 +214,20 @@ class LocalAllSong : Fragment() {
 
     private fun downloadMp3FromUrl(context: Context, url: String) {
         val request = DownloadManager.Request(Uri.parse(url))
-            .setTitle("Downloading MP3")
-            .setDescription("Downloading your file")
+            .setTitle("Descargando MP3")
+            .setDescription("Descargando tu archivo")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setAllowedOverMetered(true)
             .setAllowedOverRoaming(true)
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, "downloaded_music.mp3")
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, (DownloadName+".mp3"))
 
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         downloadManager.enqueue(request)
-        activity?.runOnUiThread {
-            Toast.makeText(context, "Download started", Toast.LENGTH_SHORT).show()
+        requireActivity().runOnUiThread {
+            Toast.makeText(context, "Descarga iniciada", Toast.LENGTH_SHORT).show()
         }
-
     }
+
+
 
 }
