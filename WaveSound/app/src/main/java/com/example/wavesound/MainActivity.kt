@@ -33,14 +33,17 @@ class MainActivity : AppCompatActivity() {
     private val READ_MEDIA_AUDIO_PERMISSION_CODE = 1002
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Verificar y solicitar permisos al iniciar la aplicación por primera vez
+        // Verificar y solicitar permisos al iniciar la aplicacion por primera vez
         checkAndRequestPermissions()
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val drawerLayout: DrawerLayout = binding.drawerLayout
+        val navView: NavigationView = binding.navView
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
 
+        // Cargar la lista de canciones favoritas y la lista de reproduccion
         LocalFavorite.favoriteSongs = ArrayList()
         val editor = getSharedPreferences("FAVORITES", MODE_PRIVATE)
         val jsonString = editor.getString("FavoriteSongs", null)
@@ -50,6 +53,7 @@ class MainActivity : AppCompatActivity() {
             LocalFavorite.favoriteSongs.addAll(data)
         }
 
+        // Cargar la lista de reproduccion
         LocalPlayList.musicPlaylist = MusicPlaylist()
         val jsonStringPlaylist = editor.getString("MusicPlaylist", null)
         val typeTokenPlaylist = object : TypeToken<MusicPlaylist>() {}.type
@@ -58,10 +62,6 @@ class MainActivity : AppCompatActivity() {
             LocalPlayList.musicPlaylist = dataPlaylist
         }
         setSupportActionBar(binding.appBarMain.toolbar)
-
-        val drawerLayout: DrawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
 
         appBarConfiguration = AppBarConfiguration(
             setOf(
@@ -72,20 +72,22 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
+    // Menu de la barra de accion
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
         return true
     }
 
+    // Navegacion de la barra de accion
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
+    // Verificar y solicitar permisos al iniciar la aplicacion por primera vez
     private fun checkAndRequestPermissions() {
-        val writeStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        //val writeStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         val readMediaAudioPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO)
-
         val permissionsToRequest = ArrayList<String>()
 
         /*Denegado por seguridad de google
@@ -103,19 +105,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Manejar la respuesta de la solicitud de permisos
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSION_CODE || requestCode == READ_MEDIA_AUDIO_PERMISSION_CODE) {
             if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                // Todos los permisos solicitados fueron concedidos, puedes realizar las acciones necesarias aquí
+                // Todos los permisos solicitados fueron concedidos, puedes realizar las acciones necesarias aqui
                 restartApplication()
             } else {
                 // Al menos un permiso fue denegado, manejar en consecuencia
-                // Por ejemplo, mostrar un mensaje al usuario o tomar otra acción
+                // Por ejemplo, mostrar un mensaje al usuario o tomar otra accion
             }
         }
     }
 
+    // Reinicia la aplicacion
     private fun restartApplication() {
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -123,6 +127,7 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
+    // Popup para confirmar la salida de la aplicacion
     override fun onBackPressed() {
         val builder = AlertDialog.Builder(this)
         builder.setMessage("Are you sure you want to exit??")
@@ -139,6 +144,7 @@ class MainActivity : AppCompatActivity() {
         dialog.getButton(DialogInterface.BUTTON_NEGATIVE)?.setTextColor(Color.WHITE)
     }
 
+    // Al salir de la aplicacion detener la musica y liberar los recursos
     override fun onDestroy() {
         super.onDestroy()
         if (!PlayerActivity.isPlaying && PlayerActivity.musicService != null) {
@@ -150,6 +156,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // Al salir de la aplicacion guardar la lista de canciones favoritas y la lista de reproduccion
     override fun onResume(){
         super.onResume()
         val editor = getSharedPreferences("FAVORITES", MODE_PRIVATE).edit()

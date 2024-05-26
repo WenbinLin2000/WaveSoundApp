@@ -29,6 +29,7 @@ import com.example.wavesound.formatDuration
 import com.example.wavesound.getImgArt
 import com.example.wavesound.setSongPosition
 
+// Clase para el servicio de musica y la notificacion
 class MusicService: Service(){
     private var myBinder = MyBinder()
     var mediaPlayer: MediaPlayer? = null
@@ -47,6 +48,7 @@ class MusicService: Service(){
         }
     }
 
+    // Funcion para mostrar la notificacion
     @SuppressLint("UnspecifiedImmutableFlag")
     fun showNotification(playPauseBtn: Int){
         val intent = Intent(baseContext, MainActivity::class.java)
@@ -58,7 +60,6 @@ class MusicService: Service(){
         }
 
         val contentIntent = PendingIntent.getActivity(this, 0, intent, flag)
-
         val prevIntent = Intent(
             baseContext, NotificationReceiver::class.java
         ).setAction(ApplicationClass.PREVIOUS)
@@ -110,50 +111,48 @@ class MusicService: Service(){
             mediaSession.setPlaybackState(getPlayBackState())
             mediaSession.setCallback(object : MediaSessionCompat.Callback() {
 
-                //called when play button is pressed
+                //Cuando se presiona el boton de play
                 override fun onPlay() {
                     super.onPlay()
                     handlePlayPause()
                 }
 
-                //called when pause button is pressed
+                //Cuando se pausa la musica
                 override fun onPause() {
                     super.onPause()
                     handlePlayPause()
                 }
 
-                //called when next button is pressed
+                //Cuando se presiona el boton de siguiente
                 override fun onSkipToNext() {
                     super.onSkipToNext()
                     prevNextSong(increment = true, context = baseContext)
                 }
 
-                //called when previous button is pressed
+                //Cuando se presiona el boton de anterior
                 override fun onSkipToPrevious() {
                     super.onSkipToPrevious()
                     prevNextSong(increment = false, context = baseContext)
                 }
 
-                //called when headphones buttons are pressed
-                //currently only pause or play music on button click
+                //Cuando se presiona el boton de play/pause
                 override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
                     handlePlayPause()
                     return super.onMediaButtonEvent(mediaButtonEvent)
                 }
 
-                //called when seekbar is changed
+                //Cuando se cambia la barra de progreso de la cancion
                 override fun onSeekTo(pos: Long) {
                     super.onSeekTo(pos)
                     mediaPlayer?.seekTo(pos.toInt())
-
                     mediaSession.setPlaybackState(getPlayBackState())
                 }
             })
         }
-
         startForeground(13, notification)
     }
 
+    // Funcion para manejar el play/pause
     fun handlePlayPause() {
         if (PlayerActivity.isPlaying) pauseMusic()
         else playMusic()
@@ -162,6 +161,7 @@ class MusicService: Service(){
         mediaSession.setPlaybackState(getPlayBackState())
     }
 
+    // Funcion para obtener el estado de la reproduccion
     fun getPlayBackState(): PlaybackStateCompat {
         val playbackSpeed = if (PlayerActivity.isPlaying) 1F else 0F
 
@@ -172,6 +172,7 @@ class MusicService: Service(){
             .build()
     }
 
+    // Funcion para reproducir la musica
     private fun playMusic(){
         //play music
         PlayerActivity.binding.playPauseBtnPA.setImageResource(R.drawable.baseline_pause_24)
@@ -181,6 +182,7 @@ class MusicService: Service(){
         showNotification(R.drawable.baseline_pause_24)
     }
 
+    // Funcion para pausar la musica
     private fun pauseMusic(){
         //pause music
         PlayerActivity.binding.playPauseBtnPA.setImageResource(R.drawable.baseline_play_arrow_24)
@@ -190,10 +192,9 @@ class MusicService: Service(){
         showNotification(R.drawable.baseline_play_arrow_24)
     }
 
+    // Funcion para reproducir la siguiente o anterior cancion
     private fun prevNextSong(increment: Boolean, context: Context){
-
         setSongPosition(increment = increment)
-
         PlayerActivity.musicService?.createMediaPlayer()
         Glide.with(context)
             .load(PlayerActivity.musicListPA[PlayerActivity.songPosition].artUri)
@@ -201,24 +202,23 @@ class MusicService: Service(){
             .into(PlayerActivity.binding.songImgPA)
 
         PlayerActivity.binding.songNamePA.text = PlayerActivity.musicListPA[PlayerActivity.songPosition].title
-
         Glide.with(context)
             .load(PlayerActivity.musicListPA[PlayerActivity.songPosition].artUri)
             .apply(RequestOptions().placeholder(R.drawable.logob).centerCrop())
             .into(NowPlaying.binding.songImgNP)
 
         NowPlaying.binding.songNameNP.text = PlayerActivity.musicListPA[PlayerActivity.songPosition].title
-
         playMusic()
-
         PlayerActivity.fIndex = favoriteChecker(PlayerActivity.musicListPA[PlayerActivity.songPosition].id)
-        if(PlayerActivity.isFavourite) PlayerActivity.binding.favoriteBtnPA.setImageResource(R.drawable.baseline_favorite_24)
-        else PlayerActivity.binding.favoriteBtnPA.setImageResource(R.drawable.baseline_favorite_border_24)
+        if(PlayerActivity.isFavourite)
+            PlayerActivity.binding.favoriteBtnPA.setImageResource(R.drawable.baseline_favorite_24)
+        else
+            PlayerActivity.binding.favoriteBtnPA.setImageResource(R.drawable.baseline_favorite_border_24)
 
-        //update playback state for notification
         mediaSession.setPlaybackState(getPlayBackState())
     }
 
+    // Funcion para crear el reproductor de musica
     fun createMediaPlayer() {
         if (PlayerActivity.isShuffleEnabled) {
             PlayerActivity.musicListPA = ArrayList()
@@ -247,6 +247,7 @@ class MusicService: Service(){
         }
     }
 
+    // Funcion para configurar el seekbar
     fun seekBarSetUp(){
         runnable = Runnable {
             PlayerActivity.binding.seekBarPA.progress = mediaPlayer!!.currentPosition

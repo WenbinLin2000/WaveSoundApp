@@ -6,6 +6,7 @@ import android.content.Intent
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 
+// Clase para recibir notificaciones
 class NotificationReceiver:BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         when(intent?.action){
@@ -18,6 +19,8 @@ class NotificationReceiver:BroadcastReceiver() {
             }
         }
     }
+
+    // Funcion para reproducir la cancion
     private fun playMusic(){
         PlayerActivity.isPlaying = true
         PlayerActivity.musicService!!.mediaPlayer!!.start()
@@ -27,6 +30,7 @@ class NotificationReceiver:BroadcastReceiver() {
         try{ NowPlaying.binding.playPauseBtnNP.setImageResource(R.drawable.baseline_pause_24) }catch (_: Exception){}
     }
 
+    // Funcion para pausar la cancion
     private fun pauseMusic(){
         PlayerActivity.isPlaying = false
         PlayerActivity.musicService!!.mediaPlayer!!.pause()
@@ -36,6 +40,7 @@ class NotificationReceiver:BroadcastReceiver() {
         try{ NowPlaying.binding.playPauseBtnNP.setImageResource(R.drawable.baseline_play_arrow_24) }catch (_: Exception){}
     }
 
+    // Funcion para saltar a la siguiente o anterior cancion
     private fun prevNextSong(increment: Boolean, context: Context){
         setSongPosition(increment = increment)
         PlayerActivity.musicService!!.createMediaPlayer()
@@ -55,5 +60,4 @@ class NotificationReceiver:BroadcastReceiver() {
         if(PlayerActivity.isFavourite) PlayerActivity.binding.favoriteBtnPA.setImageResource(R.drawable.baseline_favorite_24)
         else PlayerActivity.binding.favoriteBtnPA.setImageResource(R.drawable.baseline_favorite_border_24)
     }
-
 }

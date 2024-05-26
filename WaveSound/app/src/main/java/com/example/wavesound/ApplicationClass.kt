@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
 
+// Clase que crea un canal de notificacion para la aplicacion
 class ApplicationClass: Application() {
     companion object{
         const val CHANNEL_ID = "channel1"

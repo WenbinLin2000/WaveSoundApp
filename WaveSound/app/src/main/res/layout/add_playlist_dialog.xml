@@ -13,7 +13,7 @@
         android:layout_marginTop="10dp"
         app:startIconDrawable="@drawable/baseline_queue_music_24"
         app:startIconTint="@color/white"
-        android:hint="Playlist Name"
+        android:hint="@string/playlist_name"
         >
 
         <com.google.android.material.textfield.TextInputEditText
@@ -34,7 +34,7 @@
         android:layout_marginTop="10dp"
         app:startIconDrawable="@drawable/baseline_music_video_24"
         app:startIconTint="@color/white"
-        android:hint="User Name">
+        android:hint="@string/user_name">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/yourName"
             android:layout_width="match_parent"

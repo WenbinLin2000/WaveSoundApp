@@ -1,6 +1,8 @@
 package com.example.wavesound.ui.local
 
+import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -15,14 +17,14 @@ import com.example.wavesound.databinding.ActivityPlayListDetailsBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.GsonBuilder
 
+// Clase que muestra los detalles de una lista de reproduccion
 class PlayListDetails : AppCompatActivity() {
-
-    lateinit var binding: ActivityPlayListDetailsBinding
-    lateinit var adapter: MusicAdapter
-
     companion object {
         var currentPlaylistPos: Int = -1
     }
+
+    lateinit var binding: ActivityPlayListDetailsBinding
+    lateinit var adapter: MusicAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,15 +40,17 @@ class PlayListDetails : AppCompatActivity() {
         binding.playlistDetailsRV.setItemViewCacheSize(10)
         binding.playlistDetailsRV.setHasFixedSize(true)
         binding.playlistDetailsRV.layoutManager = LinearLayoutManager(this)
-        //LocalPlayList.musicPlaylist.ref[currentPlaylistPos].playlist.addAll(LocalAllSong.MusicListMA)
         adapter = MusicAdapter(this, LocalPlayList.musicPlaylist.ref[currentPlaylistPos].playlist, playlistDetails = true)
         binding.playlistDetailsRV.adapter = adapter
 
         binding.backBtnPD.setOnClickListener { finish() }
+
+        // Agrega canciones a la lista de reproduccion
         binding.addBtnPD.setOnClickListener {
             startActivity(Intent(this, SelectionActivity::class.java))
-
         }
+
+        // Elimina todas las canciones de la lista de reproduccion
         binding.removeAllPD.setOnClickListener {
             val builder = MaterialAlertDialogBuilder(this)
             builder.setTitle("Remove All")
@@ -61,8 +65,9 @@ class PlayListDetails : AppCompatActivity() {
                 }
             val customDialog = builder.create()
             customDialog.show()
+            customDialog.getButton(DialogInterface.BUTTON_POSITIVE)?.setTextColor(Color.WHITE)
+            customDialog.getButton(DialogInterface.BUTTON_NEGATIVE)?.setTextColor(Color.WHITE)
         }
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -71,6 +76,7 @@ class PlayListDetails : AppCompatActivity() {
         }
     }
 
+    // Actualiza la lista de reproduccion
     override fun onResume() {
         super.onResume()
         binding.playlistNamePD.text = LocalPlayList.musicPlaylist.ref[currentPlaylistPos].name
@@ -89,6 +95,4 @@ class PlayListDetails : AppCompatActivity() {
         editor.putString("MusicPlaylist", jsonStringPlaylist)
         editor.apply()
     }
-
-
 }

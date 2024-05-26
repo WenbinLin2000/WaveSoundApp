@@ -11,7 +11,7 @@ import com.example.wavesound.Music
 import com.example.wavesound.checkPlaylist
 import com.example.wavesound.databinding.FragmentLocalFavoriteBinding
 
-
+// Fragmento que muestra las canciones favoritas
 class LocalFavorite : Fragment() {
     companion object {
         var favoriteSongs: ArrayList<Music> = ArrayList()
@@ -19,7 +19,6 @@ class LocalFavorite : Fragment() {
     }
     private lateinit var binding: FragmentLocalFavoriteBinding
     private lateinit var adapter: FavoriteAdapter
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,14 +32,11 @@ class LocalFavorite : Fragment() {
         binding.localFavoriteSongRV.layoutManager = LinearLayoutManager(requireContext())
         adapter = FavoriteAdapter(requireContext(), favoriteSongs)
         binding.localFavoriteSongRV.adapter = adapter
-
         favoritesChanged = false
-
-
-
         return binding.root
     }
 
+    // Actualiza la lista de canciones favoritas
     @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()

@@ -6,7 +6,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Music will stop in..."
+        android:text="@string/music_will_stop_in"
         android:textSize="24sp"
         style="@style/Text"
         android:padding="10dp"

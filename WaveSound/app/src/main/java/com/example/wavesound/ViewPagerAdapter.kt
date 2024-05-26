@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
+// Adaptador para el ViewPager2/TabLayout
 class ViewPagerAdapter(
     val fragmentList : ArrayList<Fragment>,
     fm : FragmentManager,

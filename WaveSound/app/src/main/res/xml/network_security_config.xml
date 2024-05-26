@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Este archivo es para configurar la seguridad de los dominios-->
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">192.168.1.105</domain>
+        <domain includeSubdomains="true">192.168.1.105</domain><!-- Aqui se pone la ip de la maquina donde esta el servidor -->
     </domain-config>
 </network-security-config>

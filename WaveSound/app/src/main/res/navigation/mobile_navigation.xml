@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/nav_user"
-        android:name="com.example.wavesound.ui.slideshow.SlideshowFragment"
+        android:name="com.example.wavesound.ui.user.UserProfile"
         android:label="@string/menu_user"
         tools:layout="@layout/fragment_usuario" />
 </navigation>

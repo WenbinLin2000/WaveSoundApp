@@ -13,12 +13,13 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.wavesound.databinding.FragmentNowPlayingBinding
 import com.example.wavesound.ui.local.LocalFavorite
 
+// Fragmento que muestra la cancion que se está reproduciendo actualmente
 class NowPlaying : Fragment() {
-
     companion object{
         @SuppressLint("StaticFieldLeak")
         lateinit var binding: FragmentNowPlayingBinding
 
+        // Revisa si la cancion es favorito y cambia el icono
         fun changeFavoriteIcon(){
             if(PlayerActivity.isFavourite) binding.favoriteBtnNP.setImageResource(R.drawable.baseline_favorite_24)
             else binding.favoriteBtnNP.setImageResource(R.drawable.baseline_favorite_border_24)
@@ -60,6 +61,7 @@ class NowPlaying : Fragment() {
         return view
     }
 
+    // Actualiza la interfaz gráfica con la cancion actual
     override fun onResume() {
         super.onResume()
         if(PlayerActivity.musicService != null){
@@ -75,7 +77,7 @@ class NowPlaying : Fragment() {
             if (PlayerActivity.isFavourite) binding.favoriteBtnNP.setImageResource(R.drawable.baseline_favorite_24)
             else binding.favoriteBtnNP.setImageResource(R.drawable.baseline_favorite_border_24)
 
-            // Establecer el listener para detectar cuando la canción actual finaliza
+            // Establecer el listener para detectar cuando la cancion actual finaliza
             PlayerActivity.musicService!!.mediaPlayer!!.setOnCompletionListener {
                 setSongPosition(increment = true)
                 PlayerActivity.musicService!!.createMediaPlayer()
@@ -91,6 +93,7 @@ class NowPlaying : Fragment() {
         }
     }
 
+    // Fucion de play
     private fun playMusic(){
         PlayerActivity.isPlaying = true
         PlayerActivity.musicService!!.mediaPlayer!!.start()
@@ -100,6 +103,7 @@ class NowPlaying : Fragment() {
 
     }
 
+    // Funcion de pausa
     private fun pauseMusic(){
         PlayerActivity.isPlaying = false
         PlayerActivity.musicService!!.mediaPlayer!!.pause()

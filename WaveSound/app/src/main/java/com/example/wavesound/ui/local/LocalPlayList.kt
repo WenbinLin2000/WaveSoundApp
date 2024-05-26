@@ -1,5 +1,7 @@
 package com.example.wavesound.ui.local
 
+import android.content.DialogInterface
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,8 +17,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+// Fragmento para mostrar las playlist locales
 class LocalPlayList : Fragment() {
-
     companion object {
         var musicPlaylist: MusicPlaylist = MusicPlaylist()
     }
@@ -38,10 +40,10 @@ class LocalPlayList : Fragment() {
         binding.addPlaylistBtn.setOnClickListener {
             customAlertDialog()
         }
-
         return binding.root
     }
 
+    // Pop up dialog para anadir playlist
     private fun customAlertDialog(){
         val customDialog = LayoutInflater.from(requireContext()).inflate(R.layout.add_playlist_dialog, binding.root, false)
         val binder = AddPlaylistDialogBinding.bind(customDialog)
@@ -59,9 +61,10 @@ class LocalPlayList : Fragment() {
                 dialog.dismiss()
             }.create()
         dialog.show()
-
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE)?.setTextColor(Color.WHITE)
     }
 
+    // Funcion para anadir playlist
     private fun addPlaylist(name: String, createdBy: String){
         var playlistExists = false
         for(i in musicPlaylist.ref) {
@@ -83,6 +86,7 @@ class LocalPlayList : Fragment() {
         }
     }
 
+    // Actualizar la lista de playlist
     override fun onResume() {
         super.onResume()
         adapter.notifyDataSetChanged()

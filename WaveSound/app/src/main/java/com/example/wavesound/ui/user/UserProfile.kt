@@ -1,4 +1,4 @@
-package com.example.wavesound.ui.slideshow
+package com.example.wavesound.ui.user
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.wavesound.R
 
-class SlideshowFragment : Fragment() {
+class UserProfile : Fragment() {
 
 
     override fun onCreateView(

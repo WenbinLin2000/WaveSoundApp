@@ -10,11 +10,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wavesound.R
 import com.example.wavesound.databinding.ActivitySelectionBinding
 
+// Actividad para seleccionar canciones
 class SelectionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySelectionBinding
     private lateinit var adapter: MusicAdapter
 
+    // Funcion que se ejecuta al crear la actividad
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -27,6 +29,7 @@ class SelectionActivity : AppCompatActivity() {
         binding.selectionRV.adapter = adapter
         binding.backBtnSA.setOnClickListener { finish() }
 
+        // Se ejecuta al buscar una cancion
         binding.searchViewSA.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = true
             override fun onQueryTextChange(newText: String?): Boolean {
@@ -42,8 +45,6 @@ class SelectionActivity : AppCompatActivity() {
                 return true
             }
         })
-
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

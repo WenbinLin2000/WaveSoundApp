@@ -3,6 +3,8 @@ package com.example.wavesound.ui.local
 import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.content.Context
+import android.content.DialogInterface
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -28,28 +30,28 @@ import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
+// Fragmento para mostrar todas las canciones locales
 class LocalAllSong : Fragment() {
-
-    private lateinit var binding: FragmentLocalAllSongBinding
-    private lateinit var musicAdapter: MusicAdapter
-    private lateinit var DownloadName: String
     companion object {
-
         var MusicListMA: ArrayList<Music> = ArrayList()
         private var originalMusicList: ArrayList<Music> = ArrayList()
         lateinit var musicListSearch : ArrayList<Music>
         var search: Boolean = false
     }
 
+    private lateinit var binding: FragmentLocalAllSongBinding
+    private lateinit var musicAdapter: MusicAdapter
+    private lateinit var DownloadName: String
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         binding = FragmentLocalAllSongBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    // Se ejecuta cuando la vista ha sido creada
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         originalMusicList = getAllAdioFiles()
@@ -62,32 +64,10 @@ class LocalAllSong : Fragment() {
 
             val searchText = binding.searchInput.text.toString().trim()
             searchSongs(searchText)
-
         }
     }
 
-    private fun customAlertDialog(){
-        val customDialog = LayoutInflater.from(requireContext()).inflate(R.layout.add_song_dialog, binding.root, false)
-        val binder = AddSongDialogBinding.bind(customDialog)
-        val builder = MaterialAlertDialogBuilder(requireContext())
-        val dialog = builder.setView(customDialog)
-            .setTitle("Add Song")
-            .setPositiveButton("ADD"){ dialog, _ ->
-                val songURL = binder.songURL.text
-                val songName = binder.songName.text
-                DownloadName = songName.toString()
-                Log.d("Song URL1", songURL.toString())
-                if(songURL != null)
-                    if(songURL.isNotEmpty()) {
-                        convertAndDownloadAudio(songURL.toString(), songName.toString())
-
-                    }
-                dialog.dismiss()
-            }.create()
-        dialog.show()
-
-    }
-
+    // Funcion para inicializar la vista y rellenarla con las canciones
     private fun initializeLayout() {
         search = false
         MusicListMA = getAllAdioFiles()
@@ -99,29 +79,7 @@ class LocalAllSong : Fragment() {
         binding.totalSongs.text = "Total Songs: "+ musicAdapter.itemCount.toString()
     }
 
-    private fun searchSongs(songTxt: String) {
-        if (songTxt.isNotEmpty()) {
-            musicListSearch = ArrayList()
-           for (song in MusicListMA) {
-               if (song.title.contains(songTxt, ignoreCase = true) ||
-                   song.album.contains(songTxt, ignoreCase = true) ||
-                   song.artist.contains(songTxt, ignoreCase = true)) {
-                   musicListSearch.add(song)
-               }
-           }
-            search = true
-            musicAdapter.updateMusicList(searchList = musicListSearch)
-            binding.totalSongs.text = "Total Songs: ${musicAdapter.itemCount}"
-        } else {
-            search = false
-            MusicListMA = originalMusicList
-            musicAdapter.setData(MusicListMA)
-            binding.totalSongs.text = "Total Songs: ${musicAdapter.itemCount}"
-
-        }
-    }
-
-
+    // Funcion para obtener todas las canciones de la memoria interna
     @SuppressLint("Range")
     private fun getAllAdioFiles(): ArrayList<Music>{
         val tempList = arrayListOf<Music>()
@@ -164,16 +122,61 @@ class LocalAllSong : Fragment() {
             }
             cursor.close()
         }
-
         return tempList
     }
 
+    // Funcion para buscar canciones
+    private fun searchSongs(songTxt: String) {
+        if (songTxt.isNotEmpty()) {
+            musicListSearch = ArrayList()
+            for (song in MusicListMA) {
+                if (song.title.contains(songTxt, ignoreCase = true) ||
+                    song.album.contains(songTxt, ignoreCase = true) ||
+                    song.artist.contains(songTxt, ignoreCase = true)) {
+                    musicListSearch.add(song)
+                }
+            }
+            search = true
+            musicAdapter.updateMusicList(searchList = musicListSearch)
+            binding.totalSongs.text = "Total Songs: ${musicAdapter.itemCount}"
+        } else {
+            search = false
+            MusicListMA = originalMusicList
+            musicAdapter.updateMusicList(MusicListMA)
+            binding.totalSongs.text = "Total Songs: ${musicAdapter.itemCount}"
 
+        }
+    }
+
+    // Funcion para mostrar un dialogo personalizado
+    private fun customAlertDialog(){
+        val customDialog = LayoutInflater.from(requireContext()).inflate(R.layout.add_song_dialog, binding.root, false)
+        val binder = AddSongDialogBinding.bind(customDialog)
+        val builder = MaterialAlertDialogBuilder(requireContext())
+        val dialog = builder.setView(customDialog)
+            .setTitle("Add Song")
+            .setPositiveButton("ADD"){ dialog, _ ->
+                val songURL = binder.songURL.text
+                val songName = binder.songName.text
+                DownloadName = songName.toString()
+                Log.d("Song URL1", songURL.toString())
+                if(songURL != null)
+                    if(songURL.isNotEmpty()) {
+                        convertAndDownloadAudio(songURL.toString(), songName.toString())
+
+                    }
+                dialog.dismiss()
+            }.create()
+        dialog.show()
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE)?.setTextColor(Color.WHITE)
+    }
+
+    // Funcion para convertir y descargar el audio
     private fun convertAndDownloadAudio(youtubeUrl: String, audioName: String) {
         val client = OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)  // Tiempo de espera para establecer la conexión
-            .readTimeout(30, TimeUnit.SECONDS)     // Tiempo de espera para leer los datos
-            .writeTimeout(30, TimeUnit.SECONDS)    // Tiempo de espera para escribir los datos
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .build()
 
         val json = JSONObject().apply {
@@ -183,7 +186,7 @@ class LocalAllSong : Fragment() {
         val requestBody = json.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
         val request = Request.Builder()
-            .url("http://192.168.1.105:3000/downloadAudioLocal") // Actualiza esto con la IP de tu servidor
+            .url("http://192.168.1.105:3000/downloadAudioLocal") // Actualiza IP del servidor
             .post(requestBody)
             .build()
 
@@ -212,6 +215,7 @@ class LocalAllSong : Fragment() {
         })
     }
 
+    //Funcion para descargar el archivo mp3
     private fun downloadMp3FromUrl(context: Context, url: String) {
         val request = DownloadManager.Request(Uri.parse(url))
             .setTitle("Descargando MP3")
@@ -227,7 +231,4 @@ class LocalAllSong : Fragment() {
             Toast.makeText(context, "Descarga iniciada", Toast.LENGTH_SHORT).show()
         }
     }
-
-
-
 }

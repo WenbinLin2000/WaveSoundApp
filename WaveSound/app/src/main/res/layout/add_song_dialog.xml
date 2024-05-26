@@ -13,7 +13,7 @@
         android:layout_marginTop="10dp"
         app:startIconDrawable="@drawable/baseline_add_link_24"
         app:startIconTint="@color/white"
-        android:hint="Song URL"
+        android:hint="@string/song_url"
         >
 
         <com.google.android.material.textfield.TextInputEditText
@@ -34,7 +34,7 @@
         android:layout_marginTop="10dp"
         app:startIconDrawable="@drawable/baseline_music_video_24"
         app:startIconTint="@color/white"
-        android:hint="Song Name">
+        android:hint="@string/song_name">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/songName"
             android:layout_width="match_parent"

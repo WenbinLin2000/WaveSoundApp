@@ -11,21 +11,20 @@ import com.example.wavesound.ViewPagerAdapter
 import com.example.wavesound.databinding.FragmentLocalBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
+// Fragmento que muestra las funciones locales
 class LocalFragment : Fragment() {
 
     private var _binding: FragmentLocalBinding? = null
     private val binding get() = _binding!!
 
-
+    // Se crea la vista y se asigna el adaptador al viewpager y el tablayout
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLocalBinding.inflate(inflater, container, false)
-
         val root = binding.root
-
         val fragmentList = arrayListOf(LocalAllSong(), LocalPlayList(), LocalFavorite())
 
         binding.apply {
@@ -47,11 +46,10 @@ class LocalFragment : Fragment() {
                 }
             }.attach()
         }
-
         return root
     }
 
-
+    // Al finalizar la vista, se destruye el binding
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

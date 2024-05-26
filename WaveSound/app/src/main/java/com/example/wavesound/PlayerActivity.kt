@@ -26,8 +26,8 @@ import com.example.wavesound.ui.local.PlayListDetails
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
+// Actividad que muestra la cancion actualmente en reproduccion
 class PlayerActivity : AppCompatActivity(), ServiceConnection {
-
     companion object {
         lateinit var musicListPA : ArrayList<Music>
         var songPosition: Int = 0
@@ -51,8 +51,6 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
             else binding.favoriteBtnPA.setImageResource(R.drawable.baseline_favorite_border_24)
         }
     }
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,9 +85,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
                     musicService!!.mediaPlayer!!.seekTo(progress)
                 }
             }
-
             override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
-
             override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
         })
         binding.timerBtnPA.setOnClickListener {
@@ -131,12 +127,12 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
         binding.shuffleBtnPA.setOnClickListener {
             isShuffleEnabled = !isShuffleEnabled
 
-            // Actualizar la apariencia del botón según el estado de la reproducción aleatoria
+            // Actualizar la apariencia del boton segun el estado de la reproduccion aleatoria
             val shuffleButtonIcon = if (isShuffleEnabled) {
-                // Si la reproducción aleatoria está activada, establecer el icono correspondiente
+                // Si la reproduccion aleatoria está activada, establecer el icono correspondiente
                 R.drawable.baseline_shuffle_24
             } else {
-                // Si la reproducción aleatoria está desactivada, establecer el icono correspondiente
+                // Si la reproduccion aleatoria está desactivada, establecer el icono correspondiente
                 R.drawable.baseline_reorder_24
             }
             binding.shuffleBtnPA.setImageResource(shuffleButtonIcon)
@@ -164,7 +160,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
         }
     }
 
-    // Actualizar la interfaz de usuario con la información de la canción actual
+    // Actualizar la interfaz de usuario con la informacion de la cancion actual
     private fun setLayout(){
         fIndex = favoriteChecker(musicListPA[songPosition].id)
 
@@ -185,7 +181,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
         else binding.favoriteBtnPA.setImageResource(R.drawable.baseline_favorite_border_24)
     }
 
-    // Crear un reproductor de medios para la canción actual
+    // Crear un reproductor de medios para la cancion actual
     private fun createMediaPlayer() {
         try {
             if (musicService!!.mediaPlayer == null) {
@@ -195,7 +191,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
             musicService!!.mediaPlayer!!.setDataSource(musicListPA[songPosition].path)
             musicService!!.mediaPlayer!!.prepare()
             musicService!!.mediaPlayer!!.setOnCompletionListener {
-                // Reproducir automáticamente la siguiente canción al finalizar la actual
+                // Reproducir automáticamente la siguiente cancion al finalizar la actual
                 prevNextSong(true)
             }
             musicService!!.mediaPlayer!!.start()
@@ -216,16 +212,16 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
         songPosition = intent.getIntExtra("index", 0)
         when(intent.getStringExtra("class")){
             "FavoriteAdapter" -> {
-                // Iniciar el servicio de música
+                // Iniciar el servicio de musica
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
                 startService(intent)
                 musicListPA = ArrayList()
-                musicListPA.addAll(LocalFavorite.favoriteSongs) // Utilizar la lista de favoritos aquí
+                musicListPA.addAll(LocalFavorite.favoriteSongs)
                 setLayout()
             }
             "MusicAdapterSearch" -> {
-                // Iniciar el servicio de música
+                // Iniciar el servicio de musica
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
                 startService(intent)
@@ -245,7 +241,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
                 }
             }
             "MusicAdapter" -> {
-                // Iniciar el servicio de música
+                // Iniciar el servicio de musica
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
                 startService(intent)
@@ -254,7 +250,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
                 setLayout()
             }
             "LocalAllSong" -> {
-                // Iniciar el servicio de música
+                // Iniciar el servicio de musica
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
                 startService(intent)
@@ -263,7 +259,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
                 setLayout()
             }
             "PlaylistDetailsAdapter" -> {
-                // Iniciar el servicio de música
+                // Iniciar el servicio de musica
                 val intent = Intent(this, MusicService::class.java)
                 bindService(intent, this, BIND_AUTO_CREATE)
                 startService(intent)
@@ -273,6 +269,8 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
             }
         }
     }
+
+    // Funcion de play
     private fun playMusic(){
         binding.playPauseBtnPA.setImageResource(R.drawable.baseline_pause_24)
         musicService!!.showNotification(R.drawable.baseline_pause_24)
@@ -281,6 +279,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
 
     }
 
+    // Funcion de pausa
     private fun pauseMusic(){
         binding.playPauseBtnPA.setImageResource(R.drawable.baseline_play_arrow_24)
         musicService!!.showNotification(R.drawable.baseline_play_arrow_24)
@@ -288,39 +287,38 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
         musicService!!.mediaPlayer!!.pause()
     }
 
+    // Funcion de saltar a la siguiente o anteior cancion
     private fun prevNextSong(increment: Boolean) {
         if (isShuffleEnabled) {
-            // Si la reproducción aleatoria está activada, mezclar la lista de reproducción
+            // Si la reproduccion aleatoria está activada, mezclar la lista de reproduccion
             musicListPA.shuffle()
-            // Luego, establecer el diseño y crear el reproductor de medios
             setLayout()
             createMediaPlayer()
         } else {
-            // Si no, avanzar o retroceder en la lista de canciones según corresponda
+            // Si no, avanzar o retroceder en la lista de canciones segun corresponda
             if (increment) {
                 setSongPosition(true)
             } else {
                 setSongPosition(false)
             }
-            // Luego, establecer el diseño y crear el reproductor de medios
             setLayout()
             createMediaPlayer()
         }
     }
 
-
+    // Funcion que revisa el servicio de musica para la notificacion
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         val binder = service as MusicService.MyBinder
         musicService = binder.currentService()
         createMediaPlayer()
         musicService!!.seekBarSetUp()
-
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
         musicService = null
     }
 
+    // Ventana de dialogo para el cronometro de apagado automatico
     private fun showBottonSheetDialog() {
         val dialog = BottomSheetDialog(this@PlayerActivity)
         dialog.setContentView(R.layout.bottom_sheet_dialog)
@@ -366,5 +364,4 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection {
             dialog.dismiss()
         }
     }
-
 }
